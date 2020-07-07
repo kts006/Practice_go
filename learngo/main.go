@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/kts006/learngo/something"
+	"github.com/kts006/banking"
 )
 
 func main() {
-	something.StructMain()
+	banking.BankingMain()
 }
