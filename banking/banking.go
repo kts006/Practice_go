@@ -17,18 +17,24 @@ import (
 // BankingMain main method
 func BankingMain() {
 	account := NewAccount("AAAA")
-	fmt.Println(account) // &{AAAA 0}
+	fmt.Println(account)
+	// String() 메소드가 존재하지 않으면 &{AAAA 0}
 
 	account.Deposit(10)
 	fmt.Println(account)
 
 	fmt.Println(account.GetBalance())
+	fmt.Println("Owner", account.Owner())
+
+	account.ChangeOwner("NewOwner")
+	fmt.Println("Owner", account.Owner())
 
 	err := account.Withdraw(20)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	fmt.Println(account.GetBalance())
+
 }
 
 // BankAccount account
@@ -67,4 +73,20 @@ func (a *BankAccount) Withdraw(amount int) error {
 	}
 	a.balance -= amount
 	return nil
+}
+
+//ChangeOwner change owner
+func (a *BankAccount) ChangeOwner(newOwner string) {
+	a.owner = newOwner
+}
+
+//Owner BankAccount getter owner
+func (a BankAccount) Owner() string {
+	return a.owner
+}
+
+//Stirng class represente string
+func (a BankAccount) String() string {
+	//in python like '__str__'
+	return fmt.Sprint("Owner: ", a.owner, ", balance: ", a.balance)
 }
