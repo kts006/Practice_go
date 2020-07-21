@@ -8,8 +8,14 @@ import (
 
 var errRequestFailed = errors.New("Request Failed")
 
+type result struct {
+	url    string
+	status string
+}
+
 func main() {
-	var results = map[string]string{}
+	results := map[string]string{}
+	channel := make(chan result)
 	urls := []string{
 		"https://google.com",
 		"https://naver.com",
@@ -18,26 +24,25 @@ func main() {
 	}
 
 	for _, url := range urls {
-		result := "OK"
-		err := hitURL(url)
-		if err != nil {
-			result = "FAILED"
-		}
-		results[url] = result
+		go hitURL(url, channel)
+
 	}
-	for url, result := range results {
-		fmt.Println(url, result)
+	for i := 0; i < len(urls); i++ {
+		result := <-channel
+		results[result.url] = result.status
 	}
+	for url, status := range results {
+		fmt.Println("URL is ", url, " Status is ", status)
+	}
+
 }
 
-func hitURL(url string) error {
-	fmt.Println("CheckURL ", url)
+func hitURL(url string, channel chan result) { //channel chan <- result => 보내기만 가능, 받는건 불가능
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode >= 400 {
-		fmt.Println(err, resp.StatusCode)
-		return errRequestFailed
+		channel <- result{url: url, status: "Failed"}
 	}
-	return nil
+	channel <- result{url: url, status: "Okay"}
 }
 
 // Goroutines -> 함수를 동시에 실행시키는 함수
